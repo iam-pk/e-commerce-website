@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Taar se Taar — Admin Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --cream: #fdf6ec; --rose: #c1715b; --clay: #b5825a;
+      --ink: #2e2018; --soft-ink: #5c4033; --border: #e4cfba;
+      --card: #fff9f2; --sage: #7d9b7e; --gold: #c9963f;
+      --mauve: #9b6e7e; --shadow: rgba(92,64,51,0.13);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Lato', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
+
+    /* ── Login ── */
+    .login-screen {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #faf0e0, #ede0ef);
+    }
+    .login-box {
+      background: var(--card); border-radius: 20px; padding: 2.5rem 2rem;
+      box-shadow: 0 8px 32px var(--shadow); width: 100%; max-width: 380px;
+      border: 2.5px dashed #8B5E3C; text-align: center;
+    }
+    .login-logo { font-family: 'Dancing Script', cursive; font-size: 2rem; color: var(--rose); margin-bottom: 0.3rem; }
+    .login-sub  { font-size: 0.8rem; color: var(--soft-ink); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 2rem; }
+    .login-box input {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 11px 14px; font-family: 'Lato', sans-serif; font-size: 0.95rem;
+      color: var(--ink); background: #fff; outline: none; margin-bottom: 1rem;
+      transition: border-color 0.25s;
+    }
+    .login-box input:focus { border-color: var(--rose); }
+    .btn {
+      background: var(--rose); color: #fff; border: none; border-radius: 30px;
+      padding: 11px 32px; font-size: 0.9rem; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; cursor: pointer; transition: background 0.2s; width: 100%;
+    }
+    .btn:hover { background: var(--clay); }
+    .login-err { color: #c0392b; font-size: 0.82rem; margin-top: 0.8rem; display: none; }
+
+    /* ── Dashboard ── */
+    .dashboard { display: none; }
+    header {
+      background: var(--ink); padding: 1rem 2rem;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    }
+    .h-logo { font-family: 'Dancing Script', cursive; font-size: 1.6rem; color: #e8a898; }
+    .h-logout {
+      background: none; border: 1.5px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.7);
+      border-radius: 20px; padding: 6px 16px; font-size: 0.78rem; cursor: pointer; transition: all 0.2s;
+    }
+    .h-logout:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+    /* ── Tabs ── */
+    .tabs { background: #3a2a1e; display: flex; border-bottom: 2px solid #5c4033; }
+    .tab-btn {
+      padding: 13px 28px; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; color: rgba(255,255,255,0.45); background: none; border: none;
+      cursor: pointer; transition: all 0.2s; border-bottom: 3px solid transparent; margin-bottom: -2px;
+    }
+    .tab-btn.active { color: #e8a898; border-bottom-color: var(--rose); background: rgba(255,255,255,0.05); }
+    .tab-btn:hover:not(.active) { color: rgba(255,255,255,0.7); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .main { max-width: 1150px; margin: auto; padding: 2rem 1.5rem; }
+
+    /* Stats */
+    .stats { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem; }
+    .stat-card {
+      background: var(--card); border-radius: 14px; padding: 1.2rem 1.5rem;
+      border: 2px dashed #8B5E3C; flex: 1; min-width: 130px; box-shadow: 0 3px 12px var(--shadow);
+    }
+    .stat-num { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--rose); }
+    .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--soft-ink); margin-top: 2px; }
+
+    /* Controls */
+    .controls { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; align-items: center; }
+    .controls input, .controls select {
+      border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 14px;
+      font-family: 'Lato', sans-serif; font-size: 0.88rem; color: var(--ink);
+      background: #fff; outline: none; transition: border-color 0.2s;
+    }
+    .controls input:focus, .controls select:focus { border-color: var(--rose); }
+    .controls input { flex: 1; min-width: 180px; }
+    .btn-refresh {
+      background: var(--sage); color: #fff; border: none; border-radius: 20px;
+      padding: 9px 20px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-refresh:hover { background: #5e7e5f; }
+    .export-btn {
+      background: var(--gold); color: #fff; border: none; border-radius: 20px;
+      padding: 9px 20px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: background 0.2s;
+    }
+    .export-btn:hover { background: #a67c30; }
+
+    /* Orders Table */
+    .table-wrap { overflow-x: auto; border-radius: 16px; box-shadow: 0 4px 20px var(--shadow); }
+    table { width: 100%; border-collapse: collapse; background: var(--card); }
+    thead { background: var(--ink); }
+    thead th { padding: 13px 14px; text-align: left; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.7); font-weight: 700; }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    tbody tr:hover { background: #fdf0e5; }
+    tbody tr:last-child { border-bottom: none; }
+    td { padding: 12px 14px; font-size: 0.87rem; color: var(--soft-ink); vertical-align: middle; }
+    td.order-id { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--rose); }
+    td.customer-name { font-weight: 700; color: var(--ink); }
+    .s-Pending     { background: #fef3cd; color: #856404; }
+    .s-Confirmed   { background: #d1ecf1; color: #0c5460; }
+    .s-In-Progress { background: #e8d5f0; color: #6a1b9a; }
+    .s-Shipped     { background: #d4edda; color: #155724; }
+    .s-Delivered   { background: #c8e6c9; color: #1b5e20; }
+    .s-Cancelled   { background: #f8d7da; color: #721c24; }
+    .status-select {
+      border: 1.5px solid var(--border); border-radius: 8px; padding: 5px 8px;
+      font-size: 0.78rem; font-family: 'Lato', sans-serif; background: #fff; color: var(--ink); cursor: pointer; outline: none;
+    }
+    .notes-text { max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+    .notes-text:hover { white-space: normal; }
+    .empty-state { text-align: center; padding: 4rem 2rem; color: var(--soft-ink); font-size: 0.95rem; }
+    .empty-state span { font-size: 3rem; display: block; margin-bottom: 1rem; }
+    .loading { text-align: center; padding: 3rem; color: var(--mauve); font-size: 0.9rem; }
+
+    /* ── Products Manager ── */
+    .pm-header {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1rem; margin-bottom: 1.8rem;
+    }
+    .pm-header h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--ink); }
+    .pm-header-actions { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+    .btn-add {
+      background: var(--rose); color: #fff; border: none; border-radius: 30px;
+      padding: 10px 24px; font-size: 0.85rem; font-weight: 700; cursor: pointer;
+      letter-spacing: 0.06em; transition: background 0.2s; display: flex; align-items: center; gap: 7px;
+    }
+    .btn-add:hover { background: var(--clay); }
+    .btn-export-json {
+      background: var(--gold); color: #fff; border: none; border-radius: 30px;
+      padding: 10px 22px; font-size: 0.85rem; font-weight: 700; cursor: pointer;
+      letter-spacing: 0.06em; transition: background 0.2s;
+    }
+    .btn-export-json:hover { background: #a67c30; }
+
+    .products-manager-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.4rem;
+    }
+    .pm-card {
+      background: var(--card); border-radius: 16px; overflow: hidden;
+      border: 2px dashed #8B5E3C; box-shadow: 0 3px 14px var(--shadow); transition: transform 0.2s;
+    }
+    .pm-card:hover { transform: translateY(-3px); }
+    .pm-card-img {
+      width: 100%; aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; position: relative; overflow: hidden;
+    }
+    .pm-card-img img { width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
+    .pm-card-body { padding: 0.9rem 1rem 1.1rem; }
+    .pm-card-name { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1rem; color: var(--ink); }
+    .pm-card-sub  { font-size: 0.76rem; color: var(--mauve); margin-bottom: 0.5rem; }
+    .pm-card-price { font-weight: 700; font-size: 1rem; color: var(--rose); margin-bottom: 0.8rem; }
+    .pm-card-actions { display: flex; gap: 0.5rem; }
+    .btn-edit, .btn-delete {
+      flex: 1; border: none; border-radius: 20px; padding: 7px 0;
+      font-size: 0.76rem; font-weight: 700; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-edit   { background: #e8f4fd; color: #0c5460; }
+    .btn-edit:hover   { background: #bee5eb; }
+    .btn-delete { background: #fde8e8; color: #721c24; }
+    .btn-delete:hover { background: #f5c6cb; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); z-index: 500;
+      align-items: center; justify-content: center; padding: 1.5rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--card); border-radius: 20px; width: 100%; max-width: 520px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto;
+    }
+    .modal-header {
+      padding: 1.4rem 1.6rem 1rem; display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1.5px solid var(--border);
+    }
+    .modal-header h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--ink); }
+    .modal-close { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--soft-ink); }
+    .modal-body { padding: 1.4rem 1.6rem; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 1rem; }
+    .form-group label { font-size: 0.78rem; font-weight: 700; color: var(--soft-ink); letter-spacing: 0.06em; text-transform: uppercase; }
+    .form-group input, .form-group textarea {
+      border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 13px;
+      font-family: 'Lato', sans-serif; font-size: 0.9rem; color: var(--ink);
+      background: #fff; outline: none; transition: border-color 0.2s; resize: vertical;
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--rose); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .modal-footer {
+      padding: 1rem 1.6rem 1.4rem; display: flex; gap: 0.8rem; justify-content: flex-end;
+      border-top: 1.5px solid var(--border);
+    }
+    .btn-cancel {
+      background: #f0e8e0; color: var(--soft-ink); border: none; border-radius: 20px;
+      padding: 9px 22px; font-size: 0.85rem; font-weight: 700; cursor: pointer;
+    }
+    .btn-save {
+      background: var(--rose); color: #fff; border: none; border-radius: 20px;
+      padding: 9px 28px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-save:hover { background: var(--clay); }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--ink); color: #fff; padding: 12px 24px; border-radius: 30px;
+      font-size: 0.88rem; font-weight: 700; z-index: 600; transition: transform 0.3s; pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    .info-box {
+      background: #e8f4fd; border: 1.5px solid #bee5eb; border-radius: 12px;
+      padding: 1rem 1.2rem; font-size: 0.85rem; color: #0c5460;
+      margin-bottom: 1.5rem; line-height: 1.6;
+    }
+    .info-box strong { display: block; margin-bottom: 4px; }
+
+    footer { text-align: center; padding: 2rem; font-size: 0.75rem; color: var(--soft-ink); opacity: 0.6; }
+  </style>
+</head>
+<body>
+
+<!-- ── Login ── -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">Taar se Taar</div>
+    <div class="login-sub">Admin Panel</div>
+    <input type="password" id="pwInput" placeholder="Enter admin password…" onkeydown="if(event.key==='Enter') login()"/>
+    <button class="btn" onclick="login()">Login ✦</button>
+    <div class="login-err" id="loginErr">❌ Wrong password. Please try again.</div>
+  </div>
+</div>
+
+<!-- ── Dashboard ── -->
+<div class="dashboard" id="dashboard">
+  <header>
+    <div class="h-logo">Taar se Taar 🧵</div>
+    <button class="h-logout" onclick="logout()">Logout</button>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('orders', this)">📦 Orders</button>
+    <button class="tab-btn" onclick="switchTab('products', this)">🧵 Products</button>
+  </div>
+
+  <!-- ═══ ORDERS TAB ═══ -->
+  <div class="tab-panel active" id="tab-orders">
+    <div class="main">
+      <div class="stats">
+        <div class="stat-card"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Total Orders</div></div>
+        <div class="stat-card"><div class="stat-num" id="statPending">—</div><div class="stat-label">Pending</div></div>
+        <div class="stat-card"><div class="stat-num" id="statDelivered">—</div><div class="stat-label">Delivered</div></div>
+        <div class="stat-card"><div class="stat-num" id="statToday">—</div><div class="stat-label">Today</div></div>
+      </div>
+      <div class="controls">
+        <input type="text" id="searchInput" placeholder="🔍 Search by name, phone, or product…" oninput="filterOrders()"/>
+        <select id="statusFilter" onchange="filterOrders()">
+          <option value="">All Statuses</option>
+          <option>Pending</option><option>Confirmed</option><option>In Progress</option>
+          <option>Shipped</option><option>Delivered</option><option>Cancelled</option>
+        </select>
+        <button class="btn-refresh" onclick="loadOrders()">↻ Refresh</button>
+        <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Date & Time</th><th>Customer</th><th>Phone</th><th>Product</th><th>Qty</th><th>Address</th><th>Notes</th><th>Status</th></tr>
+          </thead>
+          <tbody id="ordersBody">
+            <tr><td colspan="9" class="loading">Loading orders…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PRODUCTS TAB ═══ -->
+  <div class="tab-panel" id="tab-products">
+    <div class="main">
+      <div class="pm-header">
+        <h2>🧵 Product Catalogue</h2>
+        <div class="pm-header-actions">
+          <button class="btn-export-json" onclick="exportProductsJSON()">📁 Export for Website</button>
+          <button class="btn-add" onclick="openAddModal()">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1v14M1 8h14" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+            Add New Product
+          </button>
+        </div>
+      </div>
+      <div class="info-box">
+        <strong>💡 How this works:</strong>
+        Add or edit products here, then click <strong>"Export for Website"</strong> to download a <code>products.js</code> file.
+        Open your <code>index.html</code>, find the <code>const products = [...]</code> array, and replace it with the contents of the downloaded file.
+      </div>
+      <div class="products-manager-grid" id="pmGrid"></div>
+    </div>
+  </div>
+
+  <footer>Taar se Taar Admin Panel — Handmade with ❤️</footer>
+</div>
+
+<!-- ── Add / Edit Modal ── -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Add New Product</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pId"/>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Product Name *</label>
+          <input type="text" id="pName" placeholder="e.g. Roti Cover"/>
+        </div>
+        <div class="form-group">
+          <label>Subtitle</label>
+          <input type="text" id="pSubtitle" placeholder="e.g. Keep rotis warm"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Price (₹) *</label>
+          <input type="number" id="pPrice" placeholder="e.g. 140"/>
+        </div>
+        <div class="form-group">
+          <label>Emoji Icon</label>
+          <input type="text" id="pIcon" placeholder="e.g. 🫓"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="pDesc" rows="3" placeholder="Describe the product…"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Image Filename</label>
+        <input type="text" id="pImg" placeholder="images/your-photo.jpg"/>
+      </div>
+      <div class="form-group">
+        <label>Background Gradient</label>
+        <input type="text" id="pBg" placeholder="linear-gradient(145deg,#f5e8d0,#edd8b0)"/>
+      </div>
+      <div class="form-group">
+        <label>Colour Swatches (comma separated)</label>
+        <input type="text" id="pColors" placeholder="#c9963f, #b5825a, #7d9b7e"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveProduct()">Save Product ✦</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API = '';
+  let adminPassword = '';
+  let allOrders = [];
+
+  const defaultProducts = [
+    { id:1,  name:"Cloth Organizer",    subtitle:"Fabric storage with charm",     icon:"🗂️", bg:"linear-gradient(145deg,#f0d5c5,#e8c0b0)", img:"images/cloth-organizer.jpg",   price:280, desc:"Sturdy multi-pocket cloth organizer for your desk, wardrobe, or wall.", colors:["#c1715b","#7d9b7e","#9b6e7e"] },
+    { id:2,  name:"Kitchen Organizer",  subtitle:"Tidy counters, happy kitchen",  icon:"🍽️", bg:"linear-gradient(145deg,#d5e8d5,#b8d4b8)", img:"images/kitchen-organizer.jpg", price:320, desc:"Fabric-based kitchen organizer to hold spoons, covers, and small essentials.", colors:["#7d9b7e","#c9963f","#c1715b"] },
+    { id:3,  name:"Pooja Aasan",        subtitle:"Sacred & handcrafted",          icon:"🙏", bg:"linear-gradient(145deg,#f5e8c8,#edd5a0)", img:"images/pooja-aasan.jpg",        price:180, desc:"Beautiful pooja aasan made from soft cotton fabric with traditional patterns.", colors:["#c9963f","#b5825a","#c1715b"] },
+    { id:4,  name:"Scrunchie Set",      subtitle:"Set of 5 fabric scrunchies",    icon:"💆", bg:"linear-gradient(145deg,#ead5e8,#d4b8cf)", img:"images/scrunchie-set.jpg",      price:150, desc:"Soft, gentle-on-hair fabric scrunchies in vibrant prints. Set of 5.", colors:["#9b6e7e","#c1715b","#c9963f"] },
+    { id:5,  name:"Hair Bows",          subtitle:"Handmade fabric bows",          icon:"🎀", bg:"linear-gradient(145deg,#f5d5e0,#eab8c8)", img:"images/hair-bows.jpg",          price:120, desc:"Cute handmade fabric hair bows for girls and women.", colors:["#c1715b","#9b6e7e","#7d9b7e"] },
+    { id:6,  name:"Roti Cover",         subtitle:"Keep rotis soft & warm",        icon:"🫓", bg:"linear-gradient(145deg,#f5e8d0,#edd8b0)", img:"images/roti-cover.jpg",         price:140, desc:"Insulated fabric roti cover that keeps rotis soft and warm for longer.", colors:["#c9963f","#b5825a","#7d9b7e"] },
+    { id:7,  name:"Handkerchiefs",      subtitle:"Set of 6 cotton hankies",       icon:"🤧", bg:"linear-gradient(145deg,#d5e8f0,#b8ced8)", img:"images/handkerchiefs.jpg",      price:180, desc:"Soft cotton handkerchiefs with embroidered or printed edges. Set of 6.", colors:["#7d9b7e","#c1715b","#9b6e7e"] },
+    { id:8,  name:"Cloth Coasters",     subtitle:"Set of 4 fabric coasters",      icon:"☕", bg:"linear-gradient(145deg,#e8e0d5,#d4c8b8)", img:"images/cloth-coasters.jpg",     price:160, desc:"Thick, absorbent fabric coasters that protect your furniture in style.", colors:["#b5825a","#c9963f","#7d9b7e"] },
+    { id:9,  name:"Fabric Wall Hanger", subtitle:"Boho home decor",               icon:"🎨", bg:"linear-gradient(145deg,#f0d5e8,#e0b8d4)", img:"images/fabric-wall-hanger.jpg", price:350, desc:"Decorative fabric wall hanging that adds warmth and colour to any room.", colors:["#9b6e7e","#c1715b","#c9963f"] },
+    { id:10, name:"Potli Bag",          subtitle:"Traditional fabric drawstring", icon:"👜", bg:"linear-gradient(145deg,#e8d5e0,#d0b8c8)", img:"images/potli-bag.jpg",          price:220, desc:"Beautiful hand-sewn potli bags in festive fabrics.", colors:["#c1715b","#9b6e7e","#c9963f"] },
+    { id:11, name:"Apron",              subtitle:"Kitchen & craft apron",         icon:"👩‍🍳", bg:"linear-gradient(145deg,#d5f0d5,#b8d8b8)", img:"images/apron.jpg",              price:260, desc:"Durable and charming kitchen apron made from cotton fabric.", colors:["#7d9b7e","#c9963f","#b5825a"] },
+    { id:12, name:"Napkin Set",         subtitle:"Cloth dining napkins",          icon:"🍃", bg:"linear-gradient(145deg,#d8f0e0,#b8d8c0)", img:"images/napkin-set.jpg",         price:200, desc:"Eco-friendly cloth dining napkins to replace paper napkins. Set of 6.", colors:["#7d9b7e","#c1715b","#c9963f"] }
+  ];
+
+  function getProducts() {
+    const saved = localStorage.getItem('tst_products');
+    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultProducts));
+  }
+  function saveProducts(p) { localStorage.setItem('tst_products', JSON.stringify(p)); }
+
+  /* ── Login ── */
+  function login() {
+    const pw = document.getElementById('pwInput').value.trim();
+    if (!pw) return;
+    adminPassword = pw;
+    loadOrders(true);
+  }
+  function logout() {
+    adminPassword = ''; allOrders = [];
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('pwInput').value = '';
+  }
+
+  /* ── Tabs ── */
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+    if (name === 'products') renderPMGrid();
+  }
+
+  /* ── Orders ── */
+  async function loadOrders(isLogin = false) {
+    try {
+      const res  = await fetch(`${API}/api/orders?password=${encodeURIComponent(adminPassword)}`);
+      const data = await res.json();
+      if (!data.success) {
+        if (isLogin) {
+          document.getElementById('loginErr').style.display = 'block';
+          setTimeout(() => document.getElementById('loginErr').style.display = 'none', 3000);
+        }
+        return;
+      }
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      allOrders = data.orders;
+      updateStats(allOrders);
+      renderTable(allOrders);
+    } catch {
+      alert('Cannot connect to server. Make sure the backend is running.');
+    }
+  }
+
+  function updateStats(orders) {
+    const today = new Date().toLocaleDateString('en-IN');
+    document.getElementById('statTotal').textContent     = orders.length;
+    document.getElementById('statPending').textContent   = orders.filter(o => o.status === 'Pending').length;
+    document.getElementById('statDelivered').textContent = orders.filter(o => o.status === 'Delivered').length;
+    document.getElementById('statToday').textContent     = orders.filter(o => new Date(o.created_at).toLocaleDateString('en-IN') === today).length;
+  }
+
+  function filterOrders() {
+    const s = document.getElementById('searchInput').value.toLowerCase();
+    const st = document.getElementById('statusFilter').value;
+    renderTable(allOrders.filter(o =>
+      (!s || o.name.toLowerCase().includes(s) || o.phone.includes(s) || o.product.toLowerCase().includes(s)) &&
+      (!st || o.status === st)
+    ));
+  }
+
+  function renderTable(orders) {
+    const tbody = document.getElementById('ordersBody');
+    if (!orders.length) { tbody.innerHTML = `<tr><td colspan="9" class="empty-state"><span>📦</span>No orders found.</td></tr>`; return; }
+    tbody.innerHTML = orders.map(o => `
+      <tr>
+        <td class="order-id">#${o.id}</td>
+        <td>${formatDate(o.created_at)}</td>
+        <td class="customer-name">${esc(o.name)}</td>
+        <td><a href="tel:${esc(o.phone)}" style="color:var(--rose);font-weight:700">${esc(o.phone)}</a></td>
+        <td><strong>${esc(o.product)}</strong></td>
+        <td style="text-align:center;font-weight:700">${o.quantity}</td>
+        <td style="max-width:140px;font-size:0.8rem">${esc(o.address)}</td>
+        <td><span class="notes-text" title="${esc(o.notes||'')}">${o.notes ? esc(o.notes) : '—'}</span></td>
+        <td>
+          <select class="status-select s-${o.status.replace(' ','-')}" onchange="updateStatus(${o.id},this.value,this)">
+            ${['Pending','Confirmed','In Progress','Shipped','Delivered','Cancelled'].map(s=>`<option ${s===o.status?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </td>
+      </tr>`).join('');
+  }
+
+  async function updateStatus(id, status, el) {
+    try {
+      const res = await fetch(`${API}/api/orders/${id}/status`, {
+        method:'PATCH', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ password: adminPassword, status })
+      });
+      const data = await res.json();
+      if (data.success) {
+        const o = allOrders.find(x => x.id === id);
+        if (o) o.status = status;
+        updateStats(allOrders);
+        el.className = 'status-select s-' + status.replace(' ','-');
+        showToast('✅ Status updated: ' + status);
+      }
+    } catch { showToast('❌ Connection error'); }
+  }
+
+  function exportCSV() {
+    if (!allOrders.length) return showToast('No orders to export');
+    const rows = [['#','Date','Name','Phone','Product','Qty','Address','Notes','Status']];
+    allOrders.forEach(o => rows.push([o.id,o.created_at,o.name,o.phone,o.product,o.quantity,o.address,o.notes||'',o.status]));
+    const csv = rows.map(r => r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    a.download = 'taarsetaar-orders.csv'; a.click();
+  }
+
+  /* ── Products Manager ── */
+  function renderPMGrid() {
+    const products = getProducts();
+    const grid = document.getElementById('pmGrid');
+    if (!products.length) {
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><span>🧵</span>No products yet. Add your first one!</div>`;
+      return;
+    }
+    grid.innerHTML = products.map(p => `
+      <div class="pm-card">
+        <div class="pm-card-img" style="background:${p.bg}">
+          <img src="${p.img}" onerror="this.style.display='none'"/>
+          <span style="position:relative;z-index:1">${p.icon}</span>
+        </div>
+        <div class="pm-card-body">
+          <div class="pm-card-name">${esc(p.name)}</div>
+          <div class="pm-card-sub">${esc(p.subtitle)}</div>
+          <div class="pm-card-price">₹${p.price}</div>
+          <div class="pm-card-actions">
+            <button class="btn-edit" onclick="openEditModal(${p.id})">✏️ Edit</button>
+            <button class="btn-delete" onclick="deleteProduct(${p.id})">🗑 Delete</button>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  function openAddModal() {
+    document.getElementById('modalTitle').textContent = 'Add New Product';
+    ['pId','pName','pSubtitle','pPrice','pDesc','pImg'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('pIcon').value   = '🧵';
+    document.getElementById('pBg').value     = 'linear-gradient(145deg,#f0d5c5,#e8c0b0)';
+    document.getElementById('pColors').value = '#c1715b, #7d9b7e, #9b6e7e';
+    document.getElementById('productModal').classList.add('open');
+  }
+
+  function openEditModal(id) {
+    const p = getProducts().find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('modalTitle').textContent = 'Edit Product';
+    document.getElementById('pId').value       = p.id;
+    document.getElementById('pName').value     = p.name;
+    document.getElementById('pSubtitle').value = p.subtitle;
+    document.getElementById('pPrice').value    = p.price;
+    document.getElementById('pIcon').value     = p.icon;
+    document.getElementById('pDesc').value     = p.desc;
+    document.getElementById('pImg').value      = p.img || '';
+    document.getElementById('pBg').value       = p.bg;
+    document.getElementById('pColors').value   = p.colors.join(', ');
+    document.getElementById('productModal').classList.add('open');
+  }
+
+  function closeModal() { document.getElementById('productModal').classList.remove('open'); }
+
+  function saveProduct() {
+    const name = document.getElementById('pName').value.trim();
+    const price = document.getElementById('pPrice').value.trim();
+    if (!name || !price) return showToast('⚠️ Name and Price are required');
+    const products = getProducts();
+    const idVal = document.getElementById('pId').value;
+    const colors = document.getElementById('pColors').value.split(',').map(c=>c.trim()).filter(Boolean);
+    const data = {
+      name, price: parseFloat(price),
+      subtitle: document.getElementById('pSubtitle').value.trim(),
+      icon:     document.getElementById('pIcon').value.trim() || '🧵',
+      desc:     document.getElementById('pDesc').value.trim(),
+      img:      document.getElementById('pImg').value.trim(),
+      bg:       document.getElementById('pBg').value.trim() || 'linear-gradient(145deg,#f0d5c5,#e8c0b0)',
+      colors:   colors.length ? colors : ['#c1715b','#7d9b7e','#9b6e7e']
+    };
+    if (idVal) {
+      const idx = products.findIndex(x => x.id === parseInt(idVal));
+      if (idx !== -1) products[idx] = { ...products[idx], ...data };
+      showToast('✅ Product updated!');
+    } else {
+      const newId = products.length ? Math.max(...products.map(p=>p.id)) + 1 : 1;
+      products.push({ id: newId, ...data });
+      showToast('✅ New product added!');
+    }
+    saveProducts(products);
+    closeModal();
+    renderPMGrid();
+  }
+
+  function deleteProduct(id) {
+    if (!confirm('Delete this product? This cannot be undone.')) return;
+    saveProducts(getProducts().filter(p => p.id !== id));
+    renderPMGrid();
+    showToast('🗑 Product deleted');
+  }
+
+  function exportProductsJSON() {
+    const products = getProducts();
+    const content = `// Paste this entire block into index.html, replacing the existing const products = [...]\nconst products = ${JSON.stringify(products, null, 2)};`;
+    const a = document.createElement('a');
+    a.href = 'data:text/javascript;charset=utf-8,' + encodeURIComponent(content);
+    a.download = 'products.js'; a.click();
+    showToast('📁 products.js downloaded! Copy its contents into index.html');
+  }
+
+  /* ── Helpers ── */
+  function formatDate(dt) {
+    const d = new Date(dt);
+    return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})
+      + '<br><span style="font-size:0.75rem;opacity:0.6">'
+      + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) + '</span>';
+  }
+  function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  document.getElementById('productModal').addEventListener('click', e => { if (e.target === document.getElementById('productModal')) closeModal(); });
+</script>
+</body>
+</html>
