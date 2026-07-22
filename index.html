@@ -91,17 +91,18 @@
     /* PRODUCTS */
     #products{background:var(--warm-bg);transition:background .3s}
     .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.8rem}
-    .product-card{background:var(--card-bg);border-radius:18px;overflow:hidden;box-shadow:0 4px 20px var(--shadow);transition:transform .3s,box-shadow .3s,background .3s;cursor:pointer;position:relative;border:2.5px dashed #8B5E3C}
+    .product-card{background:var(--card-bg);border-radius:18px;overflow:hidden;box-shadow:0 4px 20px var(--shadow);transition:transform .3s,box-shadow .3s,background .3s;cursor:pointer;position:relative;border:2.5px dashed #8B5E3C;display:flex;flex-direction:column;height:100%}
     .product-card:hover{transform:translateY(-6px);box-shadow:0 12px 36px var(--shadow)}
-    .product-img{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:4rem;position:relative;overflow:hidden}
+    .product-img{width:100%;flex:1;display:flex;align-items:center;justify-content:center;font-size:4rem;position:relative;overflow:hidden;min-height:280px}
     .product-img-overlay{position:absolute;inset:0;background:rgba(154,100,85,.82);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .35s;flex-direction:column;gap:.5rem}
     .product-card:hover .product-img-overlay{opacity:1}
     .overlay-hint{color:#fff;font-size:.82rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
-    .product-info{padding:1.1rem 1.2rem 1.3rem}
-    .product-name{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:600;color:var(--ink);margin-bottom:.3rem}
-    .product-subtitle{font-size:.8rem;color:var(--mauve);letter-spacing:.04em}
-    .product-details{max-height:0;overflow:hidden;transition:max-height .4s ease;border-top:1.5px dashed var(--border)}
-    .product-details.open{max-height:360px}
+    .product-info{padding:1.1rem 1.2rem;position:relative;z-index:1;text-align:center}
+    .product-name{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:600;color:var(--ink);margin-bottom:0}
+    .product-subtitle{display:none}
+    .swatches{display:none}
+    .product-details{position:absolute;bottom:0;left:0;right:0;max-height:0;overflow:hidden;transition:max-height .4s ease;border-top:1.5px dashed var(--border);background:var(--card-bg);z-index:2}
+    .product-card:hover .product-details,.product-details.open{max-height:360px}
     .details-inner{padding:1rem 1.2rem 1.2rem}
     .product-price{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--rose);margin-bottom:.5rem}
     .product-desc{font-size:.82rem;color:var(--soft-ink);line-height:1.65;margin-bottom:.9rem}
@@ -348,7 +349,7 @@
               <option>Cloth Organizer</option><option>Kitchen Organizer</option><option>Pooja Aasan</option>
               <option>Scrunchie Set</option><option>Hair Bows/Bands</option><option>Roti Cover</option>
               <option>Handkerchiefs</option><option>Cloth Hand Bag</option><option>Cloth Coasters</option>
-              <option>Fabric Wall Hanger</option><option>Potli Bag</option><option>Apron</option>
+              <option>Fabric Wall Hanger</option><option>Girls Frocks</option><option>Apron</option>
             </select>
           </div>
           <div class="form-group">
@@ -400,10 +401,10 @@
               <label>Product</label>
               <select id="oProduct" required>
                 <option value="">Choose product…</option>
-                <option>Cloth Organizer</option><option>Kitchen Organizer</option><option>Pooja Aasan</option>
+                <option>Paranda</option><option>Kitchen Organizer</option><option>Pooja Aasan</option>
                 <option>Scrunchie Set</option><option>Hair Bows</option><option>Roti Cover</option>
                 <option>Handkerchiefs (Set of 6)</option><option>Cloth Coasters (Set of 4)</option>
-                <option>Fabric Wall Hanger</option><option>Potli Bag</option><option>Apron</option>
+                <option>Fabric Wall Hanger</option><option>Girls Frocks</option><option>Apron</option>
                 <option>Cloth Hand Bag</option>
               </select>
             </div>
@@ -465,7 +466,7 @@
   const OWNER_WHATSAPP = '918707244352';
 
   const products = [
-    {id:1,  name:"Cloth Organizer",    subtitle:"Fabric storage with charm",     icon:"🗂️", bg:"linear-gradient(145deg,#f0d5c5,#e8c0b0)", img:"images/cloth-organizer.jpg",   price:280, desc:"Sturdy multi-pocket cloth organizer for your desk, wardrobe, or wall.",            colors:["#c1715b","#7d9b7e","#9b6e7e"]},
+    {id:1,  name:"Paranda",            subtitle:"Handmade traditional braid",   icon:"💇‍♀️", bg:"linear-gradient(145deg,#f0d5c5,#e8c0b0)", img:"images/paranda.jpg",           price:280, desc:"Beautiful handmade paranda with vibrant colors and intricate weaving patterns.",            colors:["#c1715b","#7d9b7e","#9b6e7e"]},
     {id:2,  name:"Kitchen Organizer",  subtitle:"Tidy counters, happy kitchen",  icon:"🍽️", bg:"linear-gradient(145deg,#d5e8d5,#b8d4b8)", img:"images/kitchen-organizer.jpg", price:320, desc:"Fabric-based kitchen organizer to hold spoons, covers, and small essentials.",      colors:["#7d9b7e","#c9963f","#c1715b"]},
     {id:3,  name:"Pooja Aasan",        subtitle:"Sacred & handcrafted",          icon:"🙏", bg:"linear-gradient(145deg,#f5e8c8,#edd5a0)", img:"images/pooja-aasan.jpg",        price:150, desc:"Beautiful pooja aasan made from soft cotton fabric with traditional patterns.",    colors:["#c9963f","#b5825a","#c1715b"]},
     {id:4,  name:"Scrunchie Set",      subtitle:"Set of 5 fabric scrunchies",    icon:"💆", bg:"linear-gradient(145deg,#ead5e8,#d4b8cf)", img:"images/scrunchie-set.jpg",      price:50,  desc:"Soft, gentle-on-hair fabric scrunchies in vibrant prints. Set of 5.",              colors:["#9b6e7e","#c1715b","#c9963f"]},
@@ -474,7 +475,7 @@
     {id:7,  name:"Handkerchiefs",      subtitle:"Set of 6 cotton hankies",       icon:"🤧", bg:"linear-gradient(145deg,#d5e8f0,#b8ced8)", img:"images/handkerchiefs.jpg",      price:80,  desc:"Soft cotton handkerchiefs with embroidered or printed edges. Set of 6.",           colors:["#7d9b7e","#c1715b","#9b6e7e"]},
     {id:8,  name:"Cloth Coasters",     subtitle:"Set of 4 fabric coasters",      icon:"☕", bg:"linear-gradient(145deg,#e8e0d5,#d4c8b8)", img:"images/cloth-coasters.jpg",     price:150, desc:"Thick, absorbent fabric coasters that protect your furniture in style.",           colors:["#b5825a","#c9963f","#7d9b7e"]},
     {id:9,  name:"Fabric Wall Hanger", subtitle:"Boho home decor",               icon:"🎨", bg:"linear-gradient(145deg,#f0d5e8,#e0b8d4)", img:"images/fabric-wall-hanger.jpg", price:350, desc:"Decorative fabric wall hanging that adds warmth and colour to any room.",          colors:["#9b6e7e","#c1715b","#c9963f"]},
-    {id:10, name:"Potli Bag",          subtitle:"Traditional fabric drawstring", icon:"👜", bg:"linear-gradient(145deg,#e8d5e0,#d0b8c8)", img:"images/potli-bag.jpg",          price:220, desc:"Beautiful hand-sewn potli bags in festive fabrics.",                              colors:["#c1715b","#9b6e7e","#c9963f"]},
+    {id:10, name:"Girls Frocks",       subtitle:"Handmade girls' frocks",       icon:"👗", bg:"linear-gradient(145deg,#e8d5e0,#d0b8c8)", img:"images/girls-frocks.jpg",       price:280, desc:"Adorable handmade frocks for girls in vibrant prints and comfortable fabrics.",     colors:["#c1715b","#9b6e7e","#c9963f"]},
     {id:11, name:"Apron",              subtitle:"Kitchen & craft apron",         icon:"👩‍🍳", bg:"linear-gradient(145deg,#d5f0d5,#b8d8b8)", img:"images/apron.jpg",              price:150, desc:"Durable and charming kitchen apron made from cotton fabric.",                     colors:["#7d9b7e","#c9963f","#b5825a"]},
     {id:12, name:"Cloth Hand Bag",     subtitle:"Reusable fabric carry bag",     icon:"👜", bg:"linear-gradient(145deg,#f3e0d8,#d8b8a0)", img:"images/cloth-handbag.jpg",      price:200, desc:"Stylish and eco-friendly cloth handbag perfect for daily use.",                   colors:["#a67c52","#c1715b","#6d8b74"]}
   ];
@@ -484,7 +485,7 @@
     {name:"Sunita Joshi",  city:"Pune",    product:"Pooja Aasan",       rating:5, text:"The pooja aasan has become the most beautiful thing in my mandir corner. The fabric is soft yet sturdy. You can feel the love that went into making it. Will definitely order more.", avatar:"🧕"},
     {name:"Meera Pillai",  city:"Chennai", product:"Cloth Coasters",    rating:4, text:"The coasters are adorable and very useful. I bought 3 sets — one for home, one for my office desk, and one as a gift. My colleague loved them and has already placed her own order!", avatar:"👩‍🦱"},
     {name:"Anjali Gupta",  city:"Delhi",   product:"Scrunchie Set",     rating:5, text:"These scrunchies are gentle on my hair and the fabric prints are gorgeous. My daughter and I use them every day. Supporting this wonderful homemaker felt as good as the product itself.", avatar:"👧"},
-    {name:"Deepa Nair",    city:"Kochi",   product:"Potli Bag",         rating:5, text:"I gifted these potli bags at a family event and everyone wanted to know where they came from. Absolutely stunning quality for the price. Handmade things have a soul that factory stuff doesn't.", avatar:"👩‍🦰"},
+    {name:"Deepa Nair",    city:"Kochi",   product:"Girls Frocks",         rating:5, text:"I gifted these frocks at a family event and everyone wanted to know where they came from. Absolutely stunning quality for the price. Handmade things have a soul that factory stuff doesn't.", avatar:"👩‍🦰"},
     {name:"Priya Agarwal", city:"Jaipur",  product:"Kitchen Organizer", rating:5, text:"My kitchen corner looks so organised and cheerful now. The fabric is thick and the stitching is very neat. Ordered a customised one with my favourite colour and she made it perfectly!", avatar:"👩‍🍳"}
   ];
 
@@ -507,8 +508,6 @@
         </div>
         <div class="product-info">
           <div class="product-name">${p.name}</div>
-          <div class="product-subtitle">${p.subtitle}</div>
-          <div class="swatches">${p.colors.map(c=>`<span class="swatch" style="background:${c}"></span>`).join('')}</div>
         </div>
         <div class="product-details" id="pd-${p.id}">
           <div class="details-inner">
